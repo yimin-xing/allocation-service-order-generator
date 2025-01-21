@@ -56,7 +56,7 @@ var bundledItemFaker = new Faker<ShipmentItem>()
 
 var shipmentFaker = new Faker<Shipment>()
     .RuleFor(s => s.Consignee, f => new Consignee(
-    f.Random.Number(1000000000, 2000000000).ToString(), // Phone
+    "080-0080-0090", // Phone
     "北海道",        // Address1
     "TestCity",        // Address2
     "TestStreet",       // Address3
@@ -67,7 +67,7 @@ var shipmentFaker = new Faker<Shipment>()
     .RuleFor(s => s.GiftComments, f => f.Random.Words())
     .RuleFor(s => s.GiftFlag, f => f.Random.Bool())
     .RuleFor(s => s.Noshi, f => f.Random.Words())
-    .RuleFor(s => s.DeliveryMethod, "宅配便（RSL）asdf") // Why asdf?
+    .RuleFor(s => s.DeliveryMethod, "宅配便（RSL）") 
     .RuleFor(s => s.NextDayDelivery, f => f.Random.Bool())
     .RuleFor(s => s.DeliveryDesignatedDate, f => DateOnly.FromDateTime(f.Date.Future()))
     .RuleFor(s => s.DeliveryDesignatedTime, f => f.PickRandom<DeliveryDesignatedTimeEnum>())
@@ -81,27 +81,17 @@ var shipmentFaker = new Faker<Shipment>()
     .RuleFor(s => s.CommisionTaxRate, 10)
     .RuleFor(s => s.PointAmount, f => f.Random.Int(0, 100))
     .RuleFor(s => s.CouponAmount, 0)
-    .RuleFor(s => s.Items, f =>
-    {
-        var random = f.Random.Int(1, 100);
-        if (random <= 90)
-        {
-            // 90% Single Item Orders
-            return singleItemFaker.Generate(1);
-        }
-        else if (random <= 95)
-        {
-            // 5% Two Items Orders
+    .RuleFor(s => s.Items, f => {
+    var generator = f.Random.WeightedRandom([
+        () => singleItemFaker.Generate(1),
+        () => {
             if (f.Random.Bool(0.7f)) // 70% bundled
                 return bundledItemFaker.Generate(1);
             return singleItemFaker.Generate(2);
-        }
-        else
-        {
-            // 5% More than Two Items Orders
-            return singleItemFaker.Generate(f.Random.Int(3, 200));
-        }
-    })
+        },
+        () => singleItemFaker.GenerateBetween(3,200)
+    ], new float[] { 0.9f, 0.05f, 0.05f });
+    return generator();})
     .RuleFor(s => s.DropOffLocation, f => null);
 
 var orderFaker = new Faker<Order>()
@@ -112,7 +102,7 @@ var orderFaker = new Faker<Order>()
     (
         Name: "TestBuyer",
         Email: "demo@boss.invalid",
-        Phone: f.Random.Number(1000000000, 2000000000).ToString(),
+        Phone: "080-0080-0090",
         Address1: "北海道",
         Address2: "TestCity",
         Address3: "TestStreet",
@@ -123,7 +113,7 @@ var orderFaker = new Faker<Order>()
     .RuleFor(o => o.CustomerComments, (string)null)
     .RuleFor(o => o.Memo, (string)null)
     .RuleFor(o => o.PaymentMethodName, "銀行振込")
-    .RuleFor(o => o.Shipments, f => shipmentFaker.Generate(1).ToList());
+    .RuleFor(o => o.Shipments, (f, o) => shipmentFaker.Generate(1).ToList());
 
 
 var orders = orderFaker.Generate(20);
