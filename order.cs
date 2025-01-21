@@ -3,7 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace GetOrderRestApi.Features.CreateOrderRequests.Models;
 
-public class Order{
+public class Order
+{
     public string MallOrderNumber { get; set; }
     public DateTimeOffset? MallOrderDateTime { get; set; }
     public int ShopId  { get; set; }
@@ -13,7 +14,63 @@ public class Order{
     public string? Memo { get; set; }
     public string PaymentMethodName { get; set; }
     public List<Shipment> Shipments { get; set; }
+}
+
+public class Shipment
+{
+    public Consignee Consignee { get; set; }
+    public string? GiftComments { get; set; }
+    public bool? GiftFlag { get; set; }
+    public string? Noshi { get; set; }
+    public string DeliveryMethod { get; set; }
+    public bool? NextDayDelivery { get; set; }
+    public DateOnly? DeliveryDesignatedDate { get; set; }
+    public DeliveryDesignatedTimeEnum? DeliveryDesignatedTime { get; set; }
+    public string? DeliveryComments { get; set; }
+    public string? WarehouseComments { get; set; }
+    public int? WrappingFee { get; set; }
+    public int? WrappingTaxRate { get; set; }
+    public int? DeliveryFee { get; set; }
+    public int? DeliveryTaxRate { get; set; }
+    public int? CommisionFee { get; set; }
+    public int? CommisionTaxRate { get; set; }
+    public int? PointAmount { get; set; }
+    public int? CouponAmount { get; set; }
+    public List<ShipmentItem> Items { get; set; }
+    public string? DropOffLocation { get; set; }
+}
+
+public class ShipmentItem
+{
+    public double TaxRate { get; set; }
+    public string ItemName { get; set; }
+    public bool IsTaxIncluded { get; set; }
+    public double Price { get; set; }
+    public int Quantity { get; set; }
+    public bool IsSingleItemShipping { get; set; }
+    public double Tax { get; set; }
+    public string SKUCode { get; set; }
+    public string? SelectedChoice { get; set; }
 };
+
+public record Buyer(
+    string Phone,
+    string Address1,
+    string Address2,
+    string Address3,
+    string PostalCode,
+    string CountryCode,
+    string Name,
+    string Email);
+
+public record Consignee(
+    string Phone,
+    string Address1,
+    string Address2,
+    string Address3,
+    string PostalCode,
+    string CountryCode,
+    string Name);
 
 
 [JsonConverter(typeof(DeliveryDesignatedTimeEnumConverter))]
@@ -78,59 +135,3 @@ public class DeliveryDesignatedTimeEnumConverter : JsonConverter<DeliveryDesigna
         };
     }
 }
-
-public record Shipment
-(
-    Consignee Consignee,
-    string? GiftComments,
-    bool? GiftFlag,
-    string? Noshi,
-    string DeliveryMethod,
-    bool? NextDayDelivery,
-    DateOnly? DeliveryDesignatedDate,
-    DeliveryDesignatedTimeEnum? DeliveryDesignatedTime,
-    string? DeliveryComments,
-    string? WarehouseComments,
-    int? WrappingFee,
-    int? WrappingTaxRate,
-    int? DeliveryFee,
-    int? DeliveryTaxRate,
-    int? CommisionFee,
-    int? CommisionTaxRate,
-    int? PointAmount,
-    int? CouponAmount,
-    List<ShipmentItem> Items,
-    string? DropOffLocation
-);
-
-public record ShipmentItem
-(
-    int? TaxRate,
-    string ItemName,
-    bool? IsTaxIncluded,
-    int? Price,
-    int? Quantity,
-    bool? IsSingleItemShipping,
-    int? Tax,
-    string SKUCode,
-    string? selectedChoice
-);
-
-public record Buyer(
-    string Phone,
-    string Address1,
-    string Address2,
-    string Address3,
-    string PostalCode,
-    string CountryCode,
-    string Name,
-    string Email);
-
-public record Consignee(
-    string Phone,
-    string Address1,
-    string Address2,
-    string Address3,
-    string PostalCode,
-    string CountryCode,
-    string Name);
